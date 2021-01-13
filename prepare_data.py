@@ -22,7 +22,7 @@ def displayData(i_path,p_path):
 	pts=p_path
 	imgs=i_path
 	nb_samples=len(pts)
-	for i in range(nb_samples):
+	for i in range(20):
 		image=cv2.imread(imgs[i])
 
 		ptx,pty=getPts(pts[i])
@@ -30,9 +30,16 @@ def displayData(i_path,p_path):
 		image=drawPoints(image,ptx,pty)
 		image = cv2.rectangle(image, (minx,miny), (maxx,maxy), (255,255,0), 2) 
 	
-		#cv2.imshow("",image)
-		#cv2.waitKey(0)
-		break
+		cv2.imshow("",image)
+		cv2.waitKey(1000)
+def displayCroppedData(imgs,keypoints):
+	for i in range(len(imgs)):
+		image=imgs[i].copy()
+
+		image=drawPoints(image,keypoints[i,:,0],keypoints[i,:,1])
+	
+		cv2.imshow("",image)
+		cv2.waitKey(1000)
 def generate_pert(ptx,pty):
     tran = np.round((np.random.rand(2,10)-0.5)*20)
     scale = (np.random.rand(2,10)-0.5) * 0.2
@@ -88,6 +95,7 @@ def cropData(i_path,p_path,to_save=False):
 
 
 		resized = cv2.resize(cropped, (128,128), interpolation = cv2.INTER_AREA)
+
 		images.append(resized.copy())
 		resized=drawPoints(resized,ptx,pty)
 		pointsx.append(ptx)
@@ -96,13 +104,9 @@ def cropData(i_path,p_path,to_save=False):
 		path_save_imsg=imgs[i].split("/")
 		#cv2.imshow("",resized)
 		#cv2.waitKey(100)
-		if i == 10:
-			break
-		if to_save:
-			save(path)
+
 	return images,pointsx,pointsy
-def save(path):
-	return
+
 def getMeanFace(ptxx,ptyy):
 	ptx,pty=ptxx.copy(),ptyy.copy()
 	mean_x,mean_y=np.mean(ptx,axis=0),np.mean(pty,axis=0)
@@ -166,6 +170,12 @@ def get_paths(path_imgs,path_pts):
 		pts.append(j)
 
 	return imgs,pts
+def reshape2D(pt):
+	f = pt.copy().reshape(pt.shape[0], 68, 2)
+	for i in range(pt.shape[0]):
+		f[i, :, 0] = pt[i, 0:68]
+		f[i, :, 1] = pt[i, 68:136]
+	return f
 def prepare_train_data(imgs_path,pts_path):
 	i_path,p_path = get_paths(imgs_path,pts_path)
 
@@ -183,19 +193,32 @@ def prepare_test_data(imgs_path,pts_path):
 	return np.array(pt),imgs
 def train_model(model,train_imgs_path,train_pts_path):
 	landmarks,pt_mean,imgs=prepare_train_data(train_imgs_path,train_pts_path)
+	meanfaceFile = open('meanface.face', 'wb')
+	pickle.dump(np.mean(pt_mean, axis=0), meanfaceFile)
 	m.fit(imgs,landmarks,pt_mean)
+	m.save_all()
 	return m
-def test_model(model,test_imgs_path,test_pts_path,pre_trained=False):
+def test_model(model,test_imgs_path,test_pts_path,pre_trained=False,test_all=False):
 	if pre_trained:
 		m.loadParams()
-
+	m.load_all()
+	m.loadmeanFace()
 	landmarks,pt_mean,imgs=prepare_train_data(test_imgs_path,test_pts_path)
 	m.test_model(imgs,landmarks,pre_trained)
 	return m
+#display first few images
+def test_display_cropped(imgs_path,pts_path):	
+	landmarks,pt_mean,imgs=prepare_train_data(imgs_path,pts_path)
 
+	displayCroppedData(imgs[0:10],reshape2D(landmarks[0:10]))
 
 pts_path="300w_train_landmarks.txt"
 imgs_path="300w_train_images.txt"
+	
+pts_test="lfpw_testset_landmarks.txt"
+imgs_test="lfpw_testset.txt"
 m=Model()
+#display cropped images
+#test_display_cropped(imgs_path,pts_path)
 m=train_model(m,imgs_path,pts_path)
-m=test_model(m,imgs_path,pts_path)
+m=test_model(m,imgs_test,pts_test)
