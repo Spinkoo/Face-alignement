@@ -4,6 +4,7 @@ import numpy as np
 import math
 import random
 from tp import *
+import os
 
 
 def getPts(pts):
@@ -76,6 +77,8 @@ def cropData(i_path,p_path,to_save=False):
 	for i in range(nb_samples):
 		
 		pts[i]=pts[i].replace("\\","/")
+		if not os.path.exists(imgs[i]):
+			continue
 		image=cv2.imread(imgs[i])
 		ptx,pty=getPts(pts[i])
 
