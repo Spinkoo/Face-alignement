@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import math
 import random
-from tp import *
+from Modele import *
 import os
 
 
