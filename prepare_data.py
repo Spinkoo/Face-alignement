@@ -197,8 +197,8 @@ def prepare_test_data(imgs_path,pts_path,limit=-1):
 
 	pt=combineLists(ptx,pty)
 	return np.array(pt),imgs
-def train_model(m,train_imgs_path,train_pts_path):
-	landmarks,pt_mean,imgs=prepare_train_data(train_imgs_path,train_pts_path)
+def train_model(m,train_imgs_path,train_pts_path,limit=-1):
+	landmarks,pt_mean,imgs=prepare_train_data(train_imgs_path,train_pts_path,limit)
 	meanfaceFile = open('meanface.face', 'wb')
 	pickle.dump(np.mean(pt_mean, axis=0), meanfaceFile)
 	m.fit(imgs,landmarks,pt_mean)
@@ -206,12 +206,12 @@ def train_model(m,train_imgs_path,train_pts_path):
 	dump_data(landmarks,"landmarks.L")
 	dump_data(imgs,"imgs.I")
 	return m
-def test_model(m,test_imgs_path,test_pts_path,pre_trained=False):
+def test_model(m,test_imgs_path,test_pts_path,pre_trained=False,limit=-1):
 	if pre_trained:
 		m.loadParams()
 	m.load_all()
 	m.loadmeanFace()
-	landmarks,pt_mean,imgs=prepare_train_data(test_imgs_path,test_pts_path)
+	landmarks,pt_mean,imgs=prepare_train_data(test_imgs_path,test_pts_path,limit)
 	m.test_model(imgs,landmarks,pre_trained)
 	return m
 def dump_data(data,name):
