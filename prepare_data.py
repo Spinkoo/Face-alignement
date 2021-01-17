@@ -66,7 +66,7 @@ def getBBox(ptx,pty):
 		maxy=math.ceil(max(pty))
 		return minx,miny,maxx,maxy
 
-def cropData(i_path,p_path,to_save=False):
+def cropData(i_path,p_path,limit=-1):
 	images=[]
 	pointsx=[]
 	pointsy=[]
@@ -105,6 +105,9 @@ def cropData(i_path,p_path,to_save=False):
 		pointsy.append(pty)
 		imgs[i]=imgs[i].replace("\\","/")
 		path_save_imsg=imgs[i].split("/")
+		if not limit == -1:
+			if i == limit:
+				break
 		#cv2.imshow("",resized)
 		#cv2.waitKey(100)
 
@@ -179,18 +182,18 @@ def reshape2D(pt):
 		f[i, :, 0] = pt[i, 0:68]
 		f[i, :, 1] = pt[i, 68:136]
 	return f
-def prepare_train_data(imgs_path,pts_path):
+def prepare_train_data(imgs_path,pts_path,limit=-1):
 	i_path,p_path = get_paths(imgs_path,pts_path)
 
-	imgs,ptx,pty=cropData(i_path,p_path)
+	imgs,ptx,pty=cropData(i_path,p_path,limit)
 	meanx,meany=getMeanFace(ptx,pty)
 	pt=combineLists(ptx,pty)
 	pt_mean=combineElems(meanx,meany)
 	pt_mean= [pt_mean] * len(ptx)
 	return np.array(pt),np.array(pt_mean),imgs
-def prepare_test_data(imgs_path,pts_path):
+def prepare_test_data(imgs_path,pts_path,limit=-1):
 	i_path,p_path = get_paths(imgs_path,pts_path)
-	imgs,ptx,pty=cropData(i_path,p_path)
+	imgs,ptx,pty=cropData(i_path,p_path,limit)
 
 	pt=combineLists(ptx,pty)
 	return np.array(pt),imgs
@@ -221,7 +224,7 @@ def load_data(name):
 	return data
 #display first few images
 def test_display_cropped(imgs_path,pts_path):	
-	landmarks,pt_mean,imgs=prepare_train_data(imgs_path,pts_path)
+	landmarks,pt_mean,imgs=prepare_train_data(imgs_path,pts_path,20)
 
 	displayCroppedData(imgs[0:10],reshape2D(landmarks[0:10]))
 
