@@ -10,3 +10,6 @@ m=Model()
 #test_display_cropped(imgs_path,pts_path)
 m=train_model(m,imgs_path,pts_path)
 m=test_model(m,imgs_test,pts_test)
+
+#also to limit you can do the following : m=train_model(m,imgs_path,pts_path,limit=20)
+
