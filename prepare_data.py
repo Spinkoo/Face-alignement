@@ -194,14 +194,16 @@ def prepare_test_data(imgs_path,pts_path):
 
 	pt=combineLists(ptx,pty)
 	return np.array(pt),imgs
-def train_model(model,train_imgs_path,train_pts_path):
+def train_model(m,train_imgs_path,train_pts_path):
 	landmarks,pt_mean,imgs=prepare_train_data(train_imgs_path,train_pts_path)
 	meanfaceFile = open('meanface.face', 'wb')
 	pickle.dump(np.mean(pt_mean, axis=0), meanfaceFile)
 	m.fit(imgs,landmarks,pt_mean)
 	m.save_all()
+	dump_data(landmarks,"landmarks.L")
+	dump_data(imgs,"imgs.I")
 	return m
-def test_model(model,test_imgs_path,test_pts_path,pre_trained=False,test_all=False):
+def test_model(m,test_imgs_path,test_pts_path,pre_trained=False):
 	if pre_trained:
 		m.loadParams()
 	m.load_all()
@@ -209,19 +211,17 @@ def test_model(model,test_imgs_path,test_pts_path,pre_trained=False,test_all=Fal
 	landmarks,pt_mean,imgs=prepare_train_data(test_imgs_path,test_pts_path)
 	m.test_model(imgs,landmarks,pre_trained)
 	return m
+def dump_data(data,name):
+	file_save_dump=open(name,'wb')
+
+	pickle.dump(data,file_save_dump)
+def load_data(name):
+	f = open(name,"rb")
+	data=pickle.load(f)
+	return data
 #display first few images
 def test_display_cropped(imgs_path,pts_path):	
 	landmarks,pt_mean,imgs=prepare_train_data(imgs_path,pts_path)
 
 	displayCroppedData(imgs[0:10],reshape2D(landmarks[0:10]))
 
-pts_path="300w_train_landmarks.txt"
-imgs_path="300w_train_images.txt"
-	
-pts_test="helen_testset_landmarks.txt"
-imgs_test="helen_testset.txt"
-m=Model()
-#display cropped images
-#test_display_cropped(imgs_path,pts_path)
-m=train_model(m,imgs_path,pts_path)
-m=test_model(m,imgs_test,pts_test)
