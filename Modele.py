@@ -85,6 +85,10 @@ class Model(object):
         print ('MSE :', err)
         updated_pts = self.majPoints(pt_mean, s_0)
 
+        im_true = self.draw_both_points(imgs[0].copy(), updated_pts,
+        pt, 0)
+        cv2.imshow('train', im_true)
+        cv2.waitKey(1000)
         self.i+=1
         return (updated_pts, R, axes, err)
 
@@ -208,11 +212,11 @@ class Model(object):
         self.mean_face+=s_test1
         keypoints = self.mean_face 
 
-        """ im_true = self.draw_both_points(imgs[3].copy(), keypoints,
+        im_true = self.draw_both_points(imgs[3].copy(), keypoints,
         test_pts, 3)
         cv2.imwrite(str(index)+'___test.png', im_true)
-        cv2.imshow('', im_true)
-        cv2.waitKey(1000)"""
+        cv2.imshow('test', im_true)
+        cv2.waitKey(1000)
         return s_test1
     def test_model(
         self,
