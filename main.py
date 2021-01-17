@@ -1,5 +1,5 @@
 from prepare_data import *
-from tp import *
+from Modele import *
 pts_path="300w_train_landmarks.txt"
 imgs_path="300w_train_images.txt"
 	
