@@ -1,6 +1,6 @@
 # Face-alignement
 
-Project was done by me : HARROUZ Wail and BOUMERDAS WASSILA 
+Project was done by  : HARROUZ Wail and BOUMERDAS WASSILA 
 
 First install the following ( for SIFT with opencv)  : 
 
