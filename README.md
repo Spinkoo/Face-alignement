@@ -1,7 +1,5 @@
 # Face-alignement
 
-Project was done by  : HARROUZ Wail and BOUMERDAS WASSILA 
-
 First install the following ( for SIFT with opencv)  : 
 
 pip install opencv-python==3.4.2.16
